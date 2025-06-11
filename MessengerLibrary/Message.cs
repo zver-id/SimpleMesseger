@@ -8,10 +8,10 @@ public class Message : Entity
     /// <summary>
     /// Текст сообщения
     /// </summary>
-    public string? Text { get; set; }
+    public virtual string? Text { get; set; }
     
     /// <summary>
     ///  Автор сообщения
     /// </summary>
-    public User? Autor { get; set; }
+    public virtual User? Autor { get; set; }
 }

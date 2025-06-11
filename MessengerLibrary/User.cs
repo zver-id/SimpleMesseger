@@ -8,5 +8,5 @@ public class User : Entity
     /// <summary>
     /// Имя пользователя
     /// </summary>
-    public string Name { get; set; }
+    public virtual string Name { get; set; }
 }

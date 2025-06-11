@@ -9,15 +9,15 @@ public class Chat : Entity
     /// <summary>
     /// Имя чата 
     /// </summary>
-    public string Name { get; set; }
+    public virtual string Name { get; set; }
     
     /// <summary>
     /// Список сообщений в чате 
     /// </summary>
-    public List<Message> Messages { get; set; }
+    public virtual List<Message> Messages { get; set; }
     
     /// <summary>
     /// Список пользователей в чате
     /// </summary>
-    public List<User> User { get; set; }
+    public virtual List<User> User { get; set; }
 }
