@@ -1,4 +1,6 @@
-﻿namespace MessengerLibrary;
+﻿using System.Text.Json;
+
+namespace MessengerLibrary;
 
 /// <summary>
 /// Пользователь.
@@ -9,4 +11,9 @@ public class User : Entity
     /// Имя пользователя
     /// </summary>
     public virtual string Name { get; set; }
+
+    public static User? FromJson (string Json)
+    {
+        return JsonSerializer.Deserialize<User>(Json);
+    }
 }

@@ -40,7 +40,7 @@ class Server
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
                 //Console.WriteLine("Получено сообщение: " + message);
-                var handler = new Handler(new ChatPacket(JSON));
+                var handler = new Handler(User.FromJson(message));
                 
                 // ответ
                 byte[] response = Encoding.UTF8.GetBytes(handler.Response.ToJson());
