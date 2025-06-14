@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using MessengerLibrary;
 
 namespace WebServer;
 
@@ -37,11 +38,12 @@ class Server
 
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine("Получено сообщение: " + message);
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
+                //Console.WriteLine("Получено сообщение: " + message);
+                var handler = new Handler(new ChatPacket(JSON));
                 
                 // ответ
-                byte[] response = Encoding.UTF8.GetBytes("Echo: " + message);
+                byte[] response = Encoding.UTF8.GetBytes(handler.Response.ToJson());
                 stream.Write(response, 0, response.Length);
             }
         }
