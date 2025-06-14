@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MessengerLibrary;
 
@@ -11,5 +11,11 @@ public class ChatPacket
     /// Список чатов для передачи
     /// </summary>
     public virtual List<Chat>? Chats { get; set; }
-    public virtual string? Message { get; set; }
+    public virtual Message? Message { get; set; }
+
+    public ChatPacket(List<Chat>? chats, Message? message)
+    {
+        this.Chats = chats; 
+        this.Message = message;
+    }
 }

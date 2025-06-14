@@ -20,4 +20,9 @@ public class Chat : Entity
     /// Список пользователей в чате
     /// </summary>
     public virtual List<User> User { get; set; }
+
+    public Chat(string name)
+    {
+        this.Name = name;
+    }
 }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace MessengerLibrary;
 
@@ -11,6 +11,11 @@ public class User : Entity
     /// Имя пользователя
     /// </summary>
     public virtual string Name { get; set; }
+
+    public User(string name)
+    { 
+        this.Name = name; 
+    }
 
     public static User? FromJson (string Json)
     {
