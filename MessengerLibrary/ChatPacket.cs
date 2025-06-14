@@ -10,5 +10,12 @@ public class ChatPacket
     /// <summary>
     /// Список чатов для передачи
     /// </summary>
-    public virtual List<Chat> Chats { get; set; } = new List<Chat>();
+    public virtual List<Chat>? Chats { get; set; }
+    public virtual Message? Message { get; set; }
+
+    public ChatPacket(List<Chat>? chats, Message? message)
+    {
+        this.Chats = chats; 
+        this.Message = message;
+    }
 }

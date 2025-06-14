@@ -9,4 +9,9 @@ public class User : Entity
     /// Имя пользователя
     /// </summary>
     public virtual string Name { get; set; }
+
+    public User(string name)
+    { 
+        this.Name = name; 
+    }
 }
