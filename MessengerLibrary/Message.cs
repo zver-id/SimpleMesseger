@@ -14,4 +14,10 @@ public class Message : Entity
     ///  Автор сообщения
     /// </summary>
     public virtual User? Autor { get; set; }
+
+    public Message(string? text, User? autor)
+    {
+        Text = text;
+        Autor = autor;
+    }
 }
