@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessengerLibrary", "Messeng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClient", "SimpleClient\SimpleClient.csproj", "{E44C05E9-1CAA-4905-9D21-A7769BD23099}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServer", "WebServer\WebServer.csproj", "{F4EEA44E-ECD0-4518-9547-97C2980524F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,5 +29,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C56DFFDE-E20D-4F6F-960C-71A9EE6F7175}
+		{F4EEA44E-ECD0-4518-9547-97C2980524F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4EEA44E-ECD0-4518-9547-97C2980524F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4EEA44E-ECD0-4518-9547-97C2980524F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4EEA44E-ECD0-4518-9547-97C2980524F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

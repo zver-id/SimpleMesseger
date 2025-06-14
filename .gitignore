@@ -8,3 +8,5 @@ global.json
 **obj
 **bin
 .vs
+WebServer/.idea/
+
