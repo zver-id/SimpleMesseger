@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -40,9 +40,10 @@ class Server
             int bytesRead;
             bytesRead = stream.Read(buffer, 0, buffer.Length);
             string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            var user = User.FromJson(userMessage);
             if (userMessage != null)
             {
-                var user = User.FromJson(userMessage);
+                byte[] response;
                 if (!repository.Users.Contains(user))
                 {
                     Console.WriteLine("пользователя нет");
@@ -50,11 +51,11 @@ class Server
                     var generalCart = repository.Chats.Find(x => x.Name == "General");
                     generalCart.User.Add(user);
                     Console.WriteLine(GetChatPacket(user).ToJson());
-                    byte[] bytes = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
+                    response = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
                 }
                 else
                 {
-                    byte[] bytes = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
+                    response = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
                 }
                 byte[] response = Encoding.UTF8.GetBytes("OK");
                 stream.Write(response, 0, response.Length);
