@@ -48,13 +48,20 @@ public class Client
     {
         Console.Clear();
 
-        Console.WriteLine(chats.Chats[0].Name); //пока только первый чат
-
-        foreach (Message message in chats.Chats[0].Messages)
+        try
         {
-            Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+            Console.WriteLine(chats.Chats[0].Name); //пока только первый чат
+
+            foreach (Message message in chats.Chats[0].Messages)
+            {
+                Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+            }
+            Console.Write("> ");
         }
-        Console.Write("> ");
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка получения данных с сервера" + ex.Message);
+        }
     }
 
     public void SendObj<T>(T obj)
