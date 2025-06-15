@@ -18,4 +18,9 @@ public class ChatPacket
         this.Chats = chats; 
         this.Message = message;
     }
+
+    public ChatPacket(User user)
+    {
+        
+    }
 }

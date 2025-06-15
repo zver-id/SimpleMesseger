@@ -10,7 +10,7 @@ public class Handler
     {
         if (packet.Message == null)
         {
-            this.Response = new ChatPacket();
+            //this.Response = new ChatPacket();
         }
         else
         {
