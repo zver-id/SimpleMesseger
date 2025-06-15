@@ -44,19 +44,26 @@ public class Client
         }
     }
 
-    public void PrintMessages()
+    public void PrintMessages(int chatIndex)
     {
         Console.Clear();
 
         try
         {
-            Console.WriteLine(chats.Chats[0].Name); //пока только первый чат
-
-            foreach (Message message in chats.Chats[0].Messages)
+            if (chats.Chats.Count > chatIndex)
             {
-                Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+                Console.WriteLine(chats.Chats[chatIndex].Name);
+
+                foreach (Message message in chats.Chats[chatIndex].Messages)
+                {
+                    Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+                }
+                Console.Write("> ");
             }
-            Console.Write("> ");
+            else
+            {
+                Console.WriteLine("Пока нет доступных чатов");
+            }
         }
         catch (Exception ex)
         {
