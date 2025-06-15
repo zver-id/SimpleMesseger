@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -40,7 +40,8 @@ class Server
             int bytesRead;
             bytesRead = stream.Read(buffer, 0, buffer.Length);
             string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            var user = User.FromJson(userMessage);
+            var user = Entity.FromJson<User>(userMessage);
+            var handler = new Handler(repository, user);
             if (userMessage != null)
             {
                 byte[] response;
@@ -50,12 +51,12 @@ class Server
                     repository.Users.Add(user);
                     var generalCart = repository.Chats.Find(x => x.Name == "General");
                     generalCart.User.Add(user);
-                    Console.WriteLine(GetChatPacket(user).ToJson());
-                    response = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
+                    Console.WriteLine(handler.GetChatPacket(user).ToJson());
+                    response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
                 }
                 else
                 {
-                    response = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
+                    response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
                 }
                 stream.Write(response, 0, response.Length);
             }
@@ -63,26 +64,15 @@ class Server
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
-                //Console.WriteLine("Получено сообщение: " + message);
-                var handler = new Handler(User.FromJson(message));
-                
+                Console.WriteLine("Получено сообщение: " + message);
                 // ответ
-                //byte[] response = Encoding.UTF8.GetBytes(handler.Response.ToJson());
-                //stream.Write(response, 0, response.Length);
+                var packetToSend = handler.Handle(Entity.FromJson<Message>(message));
+                
+                byte[] response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
+                stream.Write(response, 0, response.Length);
             }
         }
     }
 
-    private ChatPacket GetChatPacket(User user)
-    {
-        var packet = new ChatPacket();
-        foreach (var chat in repository.Chats)
-        {
-            if (chat.User.Contains(user))
-            {
-                packet.Chats.Add(chat);
-            };
-        }
-        return packet;
-    }
+
 }

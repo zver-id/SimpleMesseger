@@ -41,17 +41,17 @@ public class Client
         }
     }
 
-    public void PrintMessages(int chatIndex)
+    public void PrintMessages(Chat currentChat)
     {
         Console.Clear();
 
         try
         {
-            if (chats.Chats.Count > chatIndex)
+            if (currentChat != null)
             {
-                Console.WriteLine(chats.Chats[chatIndex].Name);
+                Console.WriteLine(currentChat.Name);
 
-                foreach (Message message in chats.Chats[chatIndex].Messages)
+                foreach (var message in currentChat.Messages)
                 {
                     Console.WriteLine($"{message.Autor.Name}: {message.Text}");
                 }
@@ -59,12 +59,12 @@ public class Client
             }
             else
             {
-                Console.WriteLine("Пока нет доступных чатов");
+                Console.WriteLine("Чата не существует");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Ошибка получения данных с сервера" + ex.Message + ex.StackTrace);
+            Console.WriteLine("Ошибка вывода текущего чата" + ex.Message + ex.StackTrace);
         }
     }
 

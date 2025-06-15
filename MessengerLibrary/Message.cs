@@ -14,6 +14,10 @@ public class Message : Entity
     ///  Автор сообщения
     /// </summary>
     public virtual User? Autor { get; set; }
+    /// <summary>
+    /// Чат которому принадлежит сообщение
+    /// </summary>
+    public virtual Chat? Chat { get; set; }
 
     public Message(string? text, User? autor)
     {
