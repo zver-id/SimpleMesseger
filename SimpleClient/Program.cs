@@ -16,13 +16,16 @@ public class Program
         client.SendObj(user1); //отправляем пользователя на сервер
         client.ReadMessages();
 
+        Chat currentChat = client.chats.Chats.Find(x => x.Name == "General");
+
         while (true)
         {
-            client.PrintMessages(0);
+            client.PrintMessages(currentChat);
             string text = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(text)) continue;
 
             Message message = new Message(text, user1);
+            message.Chat = client.chats.Chats.Find(x => x.Name == "General");
             client.SendObj(message);
 
             client.ReadMessages();
