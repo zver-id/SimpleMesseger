@@ -18,7 +18,7 @@ public class Program
 
         while (true)
         {
-            client.PrintMessages();
+            client.PrintMessages(0);
             string text = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(text)) continue;
 
