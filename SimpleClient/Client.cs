@@ -67,7 +67,7 @@ public class Client
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Ошибка получения данных с сервера" + ex.Message);
+            Console.WriteLine("Ошибка получения данных с сервера" + ex.Message + ex.StackTrace);
         }
     }
 
