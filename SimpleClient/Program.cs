@@ -14,7 +14,7 @@ public class Program
         User user1 = new User(name);
 
         client.SendObj(user1); //отправляем пользователя на сервер
-
+        client.ReadMessages();
 
         while (true)
         {
@@ -24,6 +24,8 @@ public class Program
 
             Message message = new Message(text, user1);
             client.SendObj(message);
+
+            client.ReadMessages();
         }
     }
 }
