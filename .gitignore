@@ -10,3 +10,5 @@ global.json
 .vs
 WebServer/.idea/
 
+
+SimpleClient/.idea/
