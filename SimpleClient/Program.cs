@@ -23,8 +23,6 @@ public class Program
             if (string.IsNullOrWhiteSpace(text)) continue;
 
             Message message = new Message(text, user1);
-
-
             client.SendObj(message);
         }
     }
