@@ -45,9 +45,11 @@ class Server
                 var user = User.FromJson(userMessage);
                 if (!repository.Users.Contains(user))
                 {
+                    Console.WriteLine("пользователя нет");
                     repository.Users.Add(user);
                     var generalCart = repository.Chats.Find(x => x.Name == "General");
                     generalCart.User.Add(user);
+                    Console.WriteLine(GetChatPacket(user).ToJson());
                     byte[] bytes = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
                 }
                 else

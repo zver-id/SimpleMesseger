@@ -11,7 +11,8 @@ public class ChatPacket
     /// <summary>
     /// Список чатов для передачи
     /// </summary>
-    public virtual List<Chat>? Chats { get; set; }
+    public virtual List<Chat>? Chats { get; set; } = new List<Chat>();
+
     public virtual Message? Message { get; set; }
 
     public string ToJson()
