@@ -21,4 +21,13 @@ public class User : Entity
     {
         return JsonSerializer.Deserialize<User>(Json);
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is User user)
+        {
+            return this.Name == user.Name;
+        }
+        return false;
+    }
 }

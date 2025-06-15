@@ -11,10 +11,12 @@ namespace WebServer;
 class Server
 {
     private TcpListener listener;
+    private InMemoryRepository repository;
 
     public Server(int port)
     {
         listener = new TcpListener(IPAddress.Any, port);
+        repository = new InMemoryRepository();
     }
 
     public void Start()
@@ -40,6 +42,24 @@ class Server
             string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
             if (userMessage != null)
             {
+                var user = User.FromJson(userMessage);
+                if (!repository.Users.Contains(user))
+                {
+                    repository.Users.Add(user);
+                    byte[] bytes = Encoding.UTF8.GetBytes(new ChatPacket().ToJson());
+                }
+                else
+                {
+                    var packet = new ChatPacket();
+                    foreach (var chat in repository.Chats)
+                    {
+                        if (chat.User.Contains(user))
+                        {
+                            packet.Chats.Add(chat);
+                        };
+                    }
+                    byte[] bytes = Encoding.UTF8.GetBytes(packet.ToJson());
+                }
                 byte[] response = Encoding.UTF8.GetBytes("OK");
                 stream.Write(response, 0, response.Length);
             }

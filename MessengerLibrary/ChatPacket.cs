@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace MessengerLibrary;
 
@@ -13,6 +14,11 @@ public class ChatPacket
     public virtual List<Chat>? Chats { get; set; }
     public virtual Message? Message { get; set; }
 
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this);
+    }
+
     public ChatPacket(List<Chat>? chats, Message? message)
     {
         this.Chats = chats; 
@@ -20,6 +26,11 @@ public class ChatPacket
     }
 
     public ChatPacket(User user)
+    {
+        
+    }
+
+    public ChatPacket()
     {
         
     }
