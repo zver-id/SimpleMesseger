@@ -19,28 +19,25 @@ public class Client
         Console.WriteLine("Подключено к серверу.");
 
         // Чтение сообщений в фоне
-        Thread readThread = new Thread(ReadMessages);
-        readThread.Start();
+        //Thread readThread = new Thread(ReadMessages);
+        //readThread.Start();
     }
 
-    private void ReadMessages()
+    public void ReadMessages()
     {
         byte[] buffer = new byte[1024];
         int bytesRead;
+        bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+        string json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        try
         {
-            string json = Encoding.UTF8.GetString(buffer);
-            try
-            {
-                ChatPacket chatPacket = JsonSerializer.Deserialize<ChatPacket>(json);
-                chats = chatPacket;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Ошибка при разборе сообщения" + ex.Message);
-            }
-            
+            ChatPacket chatPacket = JsonSerializer.Deserialize<ChatPacket>(json);
+            chats = chatPacket;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка при разборе сообщения" + ex.Message);
         }
     }
 
