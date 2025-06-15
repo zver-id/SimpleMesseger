@@ -46,19 +46,13 @@ class Server
                 if (!repository.Users.Contains(user))
                 {
                     repository.Users.Add(user);
-                    byte[] bytes = Encoding.UTF8.GetBytes(new ChatPacket().ToJson());
+                    var generalCart = repository.Chats.Find(x => x.Name == "General");
+                    generalCart.User.Add(user);
+                    byte[] bytes = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
                 }
                 else
                 {
-                    var packet = new ChatPacket();
-                    foreach (var chat in repository.Chats)
-                    {
-                        if (chat.User.Contains(user))
-                        {
-                            packet.Chats.Add(chat);
-                        };
-                    }
-                    byte[] bytes = Encoding.UTF8.GetBytes(packet.ToJson());
+                    byte[] bytes = Encoding.UTF8.GetBytes(GetChatPacket(user).ToJson());
                 }
                 byte[] response = Encoding.UTF8.GetBytes("OK");
                 stream.Write(response, 0, response.Length);
@@ -75,5 +69,18 @@ class Server
                 //stream.Write(response, 0, response.Length);
             }
         }
+    }
+
+    private ChatPacket GetChatPacket(User user)
+    {
+        var packet = new ChatPacket();
+        foreach (var chat in repository.Chats)
+        {
+            if (chat.User.Contains(user))
+            {
+                packet.Chats.Add(chat);
+            };
+        }
+        return packet;
     }
 }
