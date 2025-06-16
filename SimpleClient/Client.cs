@@ -17,10 +17,6 @@ public class Client
         client = new TcpClient(ipAddress, port);
         stream = client.GetStream();
         Console.WriteLine("Подключено к серверу.");
-
-        // Чтение сообщений в фоне
-        //Thread readThread = new Thread(ReadMessages);
-        //readThread.Start();
     }
 
     public void ReadMessages()
