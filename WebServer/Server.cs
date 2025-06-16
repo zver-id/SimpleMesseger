@@ -67,7 +67,7 @@ class Server
                 Console.WriteLine("Получено сообщение: " + message);
                 // ответ
                 var packetToSend = handler.Handle(Entity.FromJson<Message>(message));
-                
+                Console.WriteLine($"Отправил {packetToSend.ToJson()}");
                 byte[] response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
                 stream.Write(response, 0, response.Length);
             }

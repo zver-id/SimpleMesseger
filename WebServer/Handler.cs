@@ -9,7 +9,7 @@ public class Handler
 
     public ChatPacket Handle(Message message)
     {
-        var chat = message.Chat;
+        var chat = Repository.Chats.Find(x => x.Name == message.Chat.Name);
         chat.Messages.Add(message);
         return this.GetChatPacket(message.Autor);
     }
