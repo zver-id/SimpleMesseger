@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -6,7 +7,7 @@ namespace MessengerLibrary;
 /// <summary>
 /// Пакет для передачи от сервера клиенту
 /// </summary>
-public class ChatPacket
+public class ChatPacket : ICloneable
 {
     /// <summary>
     /// Список чатов для передачи
@@ -27,5 +28,13 @@ public class ChatPacket
     public ChatPacket()
     {
         
+    }
+
+    public object Clone()
+    {
+        return new ChatPacket
+        {
+            Chats = new List<Chat>(this.Chats)
+        };
     }
 }

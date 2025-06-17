@@ -11,7 +11,19 @@ public class Handler
     {
         var chat = Repository.Chats.Find(x => x.Name == message.Chat.Name);
         chat.Messages.Add(message);
-        return this.GetChatPacket(message.Autor);
+        var result = (ChatPacket)this.GetChatPacket(message.Autor).Clone();
+        LimitMessegeCount(result, 10);
+        return result;
+    }
+
+    private void LimitMessegeCount(ChatPacket packet, int count)
+    {
+        foreach (var chat in packet.Chats)
+        {
+            if (count > chat.Messages.Count)
+                continue;
+            chat.Messages = chat.Messages.GetRange(chat.Messages.Count - count, count);
+        }
     }
 
     public Handler(InMemoryRepository repository, User user)
