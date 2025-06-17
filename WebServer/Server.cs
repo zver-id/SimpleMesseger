@@ -36,7 +36,7 @@ class Server
         using (var client = (TcpClient)obj)
         using (var stream = client.GetStream())
         {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[10485760];
             int bytesRead;
             bytesRead = stream.Read(buffer, 0, buffer.Length);
             string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
@@ -47,7 +47,6 @@ class Server
                 byte[] response;
                 if (!repository.Users.Contains(user))
                 {
-                    Console.WriteLine("пользователя нет");
                     repository.Users.Add(user);
                     var generalCart = repository.Chats.Find(x => x.Name == "General");
                     generalCart.User.Add(user);
@@ -64,10 +63,9 @@ class Server
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
-                Console.WriteLine("Получено сообщение: " + message);
+                
                 // ответ
                 var packetToSend = handler.Handle(Entity.FromJson<Message>(message));
-                Console.WriteLine($"Отправил {packetToSend.ToJson()}");
                 byte[] response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
                 stream.Write(response, 0, response.Length);
             }
