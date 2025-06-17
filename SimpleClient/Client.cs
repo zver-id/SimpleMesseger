@@ -17,50 +17,50 @@ public class Client
         client = new TcpClient(ipAddress, port);
         stream = client.GetStream();
         Console.WriteLine("Подключено к серверу.");
-
-        // Чтение сообщений в фоне
-        Thread readThread = new Thread(ReadMessages);
-        readThread.Start();
     }
 
-    private void ReadMessages()
+    public void ReadMessages()
     {
         byte[] buffer = new byte[1024];
         int bytesRead;
+        bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+        string json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        try
         {
-            string json = Encoding.UTF8.GetString(buffer);
-            try
-            {
-                ChatPacket chatPacket = JsonSerializer.Deserialize<ChatPacket>(json);
-                chats = chatPacket;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Ошибка при разборе сообщения" + ex.Message);
-            }
-            
+            ChatPacket chatPacket = JsonSerializer.Deserialize<ChatPacket>(json);
+            chats = chatPacket;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка при разборе сообщения" + ex.Message);
         }
     }
 
-    public void PrintMessages()
+    public void PrintMessages(Chat currentChat)
     {
         Console.Clear();
 
         try
         {
-            Console.WriteLine(chats.Chats[0].Name); //пока только первый чат
-
-            foreach (Message message in chats.Chats[0].Messages)
+            if (currentChat != null)
             {
-                Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+                Console.WriteLine(currentChat.Name);
+
+                foreach (var message in currentChat.Messages)
+                {
+                    Console.WriteLine($"{message.Autor.Name}: {message.Text}");
+                }
+                Console.Write("> ");
             }
-            Console.Write("> ");
+            else
+            {
+                Console.WriteLine("Чата не существует");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Ошибка получения данных с сервера" + ex.Message);
+            Console.WriteLine("Ошибка вывода текущего чата" + ex.Message + ex.StackTrace);
         }
     }
 

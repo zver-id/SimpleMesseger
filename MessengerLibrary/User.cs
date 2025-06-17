@@ -16,12 +16,6 @@ public class User : Entity
     { 
         this.Name = name; 
     }
-
-    public static User? FromJson (string Json)
-    {
-        return JsonSerializer.Deserialize<User>(Json);
-    }
-
     public override bool Equals(object? obj)
     {
         if (obj is User user)

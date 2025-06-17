@@ -14,16 +14,21 @@ public class Program
         User user1 = new User(name);
 
         client.SendObj(user1); //отправляем пользователя на сервер
-
+        client.ReadMessages();
 
         while (true)
         {
-            client.PrintMessages();
+            Chat currentChat = client.chats.Chats.Find(x => x.Name == "General");
+
+            client.PrintMessages(currentChat);
             string text = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(text)) continue;
 
             Message message = new Message(text, user1);
+            message.Chat = currentChat;
             client.SendObj(message);
+
+            client.ReadMessages();
         }
     }
 }
