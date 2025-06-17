@@ -21,7 +21,7 @@ public class Client
 
     public void ReadMessages()
     {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[10485760];
         int bytesRead;
         bytesRead = stream.Read(buffer, 0, buffer.Length);
 
