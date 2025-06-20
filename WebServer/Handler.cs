@@ -5,11 +5,11 @@ namespace WebServer;
 public class Handler
 {
     public User User { get; set; }
-    private InMemoryRepository Repository { get; init; }
+    private IRepository Repository { get; init; }
 
     public ChatPacket Handle(Message message)
     {
-        var chat = Repository.Chats.Find(x => x.Name == message.Chat.Name);
+        var chat = Repository.Get<Chat>(x => x.Name == message.Chat.Name);
         chat.Messages.Add(message);
         var result = (ChatPacket)this.GetChatPacket(message.Autor).Clone();
         LimitMessegeCount(result, 10);
@@ -26,7 +26,7 @@ public class Handler
         }
     }
 
-    public Handler(InMemoryRepository repository, User user)
+    public Handler(IRepository repository, User user)
     {
         this.Repository = repository;
         this.User = user;
@@ -35,7 +35,7 @@ public class Handler
     public ChatPacket GetChatPacket(User user)
     {
         var packet = new ChatPacket();
-        foreach (var chat in Repository.Chats)
+        foreach (var chat in Repository.GetAll<Chat>(x=>true))
         {
             if (chat.User.Contains(user))
             {
