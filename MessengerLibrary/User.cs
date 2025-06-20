@@ -11,6 +11,7 @@ public class User : Entity
     /// Имя пользователя
     /// </summary>
     public virtual string Name { get; set; }
+    public virtual string Password { get; set; }
 
     public User(string name)
     { 
