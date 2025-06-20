@@ -51,29 +51,27 @@ class Server
                     string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                     var user = Entity.FromJson<User>(userMessage);
                     var handler = new Handler(repository, user);
-                    if (userMessage != null)
+                    
+                    byte[] response;
+                    if (repository.Get<User>(x=> x.Name == user.Name)==null)
                     {
-                        byte[] response;
-                        if (repository.Get<User>(x=> x.Name == user.Name)==null)
-                        {
-                            repository.Add<User>(user);
-                            var generalCart = repository.Get<Chat>(x => x.Name == "General");
-                            generalCart.User.Add(user);
-                            Console.WriteLine(handler.GetChatPacket(user).ToJson());
-                            response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
-                        }
-                        else
-                        {
-                            response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
-                        }
-                        stream.Write(response, 0, response.Length);
+                        repository.Add<User>(user);
+                        var generalCart = repository.Get<Chat>(x => x.Name == "General");
+                        generalCart.User.Add(user);
+                        Console.WriteLine(handler.GetChatPacket(user).ToJson());
+                        response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
                     }
-
+                    else
+                    {
+                        response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
+                    }
+                    stream.Write(response, 0, response.Length);
+                    
                     while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
                         var packetToSend = handler.Handle(Entity.FromJson<Message>(message));
-                        byte[] response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
+                        response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
                         stream.Write(response, 0, response.Length);
                     }
                 }
