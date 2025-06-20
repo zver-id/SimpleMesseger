@@ -46,13 +46,56 @@ class Server
                 using (var stream = client.GetStream())
                 {
                     byte[] buffer = new byte[10485760];
+                    string userMessage = ReadStream(stream, buffer);
                     int bytesRead;
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    var user = Entity.FromJson<User>(userMessage);
-                    var handler = new Handler(repository, user);
-                    
                     byte[] response;
+
+                    switch (userMessage)
+                    {
+                        case "LogIn":
+                            SendResponse("ExpectedCredentials", stream);
+                            var clientResponse =  ReadStream(stream, buffer);
+                            var user = Entity.FromJson<User>(clientResponse);
+                            var userInRepo = repository.Get<User>(x => x.Name == user.Name && x.Password == user.Password);
+                            if (userInRepo != null)
+                            {
+                                var handler = new Handler(repository, user);
+                                SendResponse(handler.GetChatPacket(user).ToJson(), stream);
+                            }
+                            else
+                            {
+                                SendResponse("AuthorizationFailed", stream);
+                            }
+                            break;
+                        case "Register":
+                            SendResponse("ExpectedUser", stream);
+                            clientResponse =  ReadStream(stream, buffer);
+                            user = Entity.FromJson<User>(clientResponse);
+                            userInRepo = repository.Get<User>(x => x.Name == user.Name);
+                            if (userInRepo != null)
+                            {
+                                SendResponse("LoginExists", stream);
+                            }
+                            else
+                            {
+                                repository.Add<User>(user);
+                                SendResponse("AccountSuccessfullyAdded", stream);
+                            }
+                            break;
+                        case "SendMessage":
+                            SendResponse("ExpectedMessage", stream);
+                            clientResponse = ReadStream(stream, buffer);
+                            var message = Entity.FromJson<Message>(clientResponse);
+                            repository.Add<Message>(message);
+                            //SendResponse(handler.GetChatPacket(message.Autor).ToJson(), stream);
+                        break;
+                    }
+
+                    
+                    
+                    
+                    
+                    
                     if (repository.Get<User>(x=> x.Name == user.Name)==null)
                     {
                         repository.Add<User>(user);
@@ -82,6 +125,18 @@ class Server
                 Console.WriteLine("Клиент разорвал подключение");
             }
 
+    }
+
+    private void SendResponse(string responseText, NetworkStream stream)
+    {
+        byte[]response = Encoding.UTF8.GetBytes(responseText);
+        stream.Write(response, 0, response.Length);
+    }
+
+    private string ReadStream(NetworkStream stream, byte[] buffer)
+    {
+        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+        return Encoding.UTF8.GetString(buffer, 0, bytesRead);
     }
 
 
