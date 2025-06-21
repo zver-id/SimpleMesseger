@@ -151,9 +151,9 @@ class Server
                                 }
                                 break;
                             default:
-                                clientResponse = ReadStream(stream, buffer);
-                                var message = Entity.FromJson<Message>(clientResponse);
-                                repository.Add<Message>(message);
+                                var message = Entity.FromJson<Message>(userMessage);
+                                var targetChat = repository.Get<Chat>(x => x.Name == message.Chat.Name);
+                                targetChat.Messages.Add(message);
                                 var messageHandler = new Handler(repository, message.Autor);
                                 SendResponse(messageHandler.GetChatPacket(message.Autor).ToJson(), stream);
                                 break;
