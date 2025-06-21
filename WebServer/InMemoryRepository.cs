@@ -13,7 +13,9 @@ public class InMemoryRepository:IRepository
     {
         Type entityType = entity.GetType();
         var repoType = this.GetType();
+
         var property  = repoType.GetProperty($"{entityType.Name}s", BindingFlags.NonPublic | BindingFlags.Instance);
+
         if (property != null && property.PropertyType.IsGenericType &&
             property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
         {
@@ -27,7 +29,9 @@ public class InMemoryRepository:IRepository
     public T? Get<T>(Predicate<T> match)
     {
         var repoType = this.GetType();
+
         var property  = repoType.GetProperty($"{typeof(T).Name}s", BindingFlags.NonPublic | BindingFlags.Instance);
+
         if (property != null && property.PropertyType.IsGenericType &&
             property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
         {
@@ -55,7 +59,7 @@ public class InMemoryRepository:IRepository
             return default;
         }
     }
-    
+
     public bool Exists<T>(Predicate<T> match)
     {
         var repoType = this.GetType();

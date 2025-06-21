@@ -8,4 +8,5 @@ public interface IRepository
     public T Get<T> (Predicate<T> match);
     public List<T> GetAll<T> (Predicate<T> match);
     public bool Exists<T>(Predicate<T> match);
+
 }
