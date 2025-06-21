@@ -55,6 +55,22 @@ public class InMemoryRepository:IRepository
             return default;
         }
     }
+    
+    public bool Exists<T>(Predicate<T> match)
+    {
+        var repoType = this.GetType();
+        var property  = repoType.GetProperty($"{typeof(T).Name}s", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (property != null && property.PropertyType.IsGenericType &&
+            property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            List<T> list = (List<T>) property.GetValue(this);
+            return list.Exists(match);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public InMemoryRepository()
     {
