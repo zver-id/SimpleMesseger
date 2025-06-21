@@ -88,12 +88,12 @@ class Server
                                 }
                                 else
                                 {
-                                    repository.Add<User>(userInRepo);
-                                    handler = new Handler(repository, userInRepo);
+                                    repository.Add<User>(user);
+                                    handler = new Handler(repository, user);
                                     var generalCart = repository.Get<Chat>(x => x.Name == "General");
-                                    generalCart.User.Add(userInRepo);
+                                    generalCart.User.Add(user);
                                     SendResponse(ClientServerDialog.UserAddedMessage, stream); 
-                                    SendResponse(handler.GetChatPacket(userInRepo).ToJson(), stream);
+                                    SendResponse(handler.GetChatPacket(user).ToJson(), stream);
                                 }
 
                                 break;
