@@ -46,35 +46,118 @@ class Server
                 using (var stream = client.GetStream())
                 {
                     byte[] buffer = new byte[10485760];
+                    string userMessage = ReadStream(stream, buffer);
                     int bytesRead;
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    string userMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    var user = Entity.FromJson<User>(userMessage);
-                    var handler = new Handler(repository, user);
-                    if (userMessage != null)
+                    byte[] response;
+                    Handler handler = null;
+                    User user;
+                    while (handler == null)
                     {
-                        byte[] response;
-                        if (repository.Get<User>(x=> x.Name == user.Name)==null)
+                        switch (userMessage)
                         {
-                            repository.Add<User>(user);
-                            var generalCart = repository.Get<Chat>(x => x.Name == "General");
-                            generalCart.User.Add(user);
-                            Console.WriteLine(handler.GetChatPacket(user).ToJson());
-                            response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
-                        }
-                        else
-                        {
-                            response = Encoding.UTF8.GetBytes(handler.GetChatPacket(user).ToJson());
-                        }
-                        stream.Write(response, 0, response.Length);
-                    }
+                            case ClientServerDialog.LogInMessage:
+                                SendResponse(ClientServerDialog.ExpectedCredentialsMessage, stream);
+                                var clientResponse = ReadStream(stream, buffer);
+                                user = Entity.FromJson<User>(clientResponse);
+                                var userInRepo =
+                                    repository.Get<User>(x => x.Name == user.Name && x.Password == user.Password);
+                                if (userInRepo != null)
+                                {
+                                    handler = new Handler(repository, userInRepo);
+                                    var generalCart = repository.Get<Chat>(x => x.Name == "General");
+                                    generalCart.User.Add(userInRepo);
+                                    SendResponse(ClientServerDialog.UserFoundMessage, stream); 
+                                    SendResponse(handler.GetChatPacket(userInRepo).ToJson(), stream);
+                                }
+                                else
+                                {
+                                    SendResponse(ClientServerDialog.AuthorizationFailedMessage, stream);
+                                    user = null;
+                                }
 
+                                break;
+                            case ClientServerDialog.RegisterMessage:
+                                SendResponse(ClientServerDialog.ExpectedUserMessage, stream);
+                                clientResponse = ReadStream(stream, buffer);
+                                user = Entity.FromJson<User>(clientResponse);
+                                userInRepo = repository.Get<User>(x => x.Name == user.Name);
+                                if (userInRepo != null)
+                                {
+                                    SendResponse(ClientServerDialog.LoginExistsMessage, stream);
+                                    user = null;
+                                }
+                                else
+                                {
+                                    repository.Add<User>(userInRepo);
+                                    handler = new Handler(repository, userInRepo);
+                                    var generalCart = repository.Get<Chat>(x => x.Name == "General");
+                                    generalCart.User.Add(userInRepo);
+                                    SendResponse(ClientServerDialog.UserAddedMessage, stream); 
+                                    SendResponse(handler.GetChatPacket(userInRepo).ToJson(), stream);
+                                }
+
+                                break;
+                            default:
+                                SendResponse($"{ClientServerDialog.UnexpectedMessage}" +
+                                             $"expected  {ClientServerDialog.LogInMessage}" +
+                                             $" or {ClientServerDialog.RegisterMessage}", stream);
+                                break; 
+                        }
+                    }
+                    
                     while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead); 
-                        var packetToSend = handler.Handle(Entity.FromJson<Message>(message));
-                        byte[] response = Encoding.UTF8.GetBytes(packetToSend.ToJson());
-                        stream.Write(response, 0, response.Length);
+                        userMessage = ReadStream(stream, buffer);
+                        switch (userMessage)
+                        {
+                            case ClientServerDialog.CreateChatMessage:
+                                SendResponse(ClientServerDialog.ExpectedChatMessage, stream);
+                                var clientResponse = ReadStream(stream, buffer);
+                                var newChat = Entity.FromJson<Chat>(clientResponse);
+                                var chatInRepo = repository.Get<Chat>(x => x.Name == newChat.Name);
+                                if (chatInRepo != null)
+                                {
+                                    SendResponse(ClientServerDialog.ChatExistsMessage, stream);
+                                }
+                                else
+                                {
+                                    repository.Add<Chat>(newChat);
+                                    SendResponse(ClientServerDialog.ChatAddedMessage, stream);
+                                    SendResponse(handler.GetChatPacket(handler.User).ToJson(), stream);
+                                }
+                                break;
+                            case ClientServerDialog.AddUserToChatMessage:
+                                SendResponse(ClientServerDialog.ExpectedChatMessage, stream);
+                                clientResponse = ReadStream(stream, buffer);
+                                var chat = Entity.FromJson<Chat>(clientResponse);
+                                chatInRepo = repository.Get<Chat>(x => x.Name == chat.Name);
+                                if (chatInRepo != null)
+                                {
+                                    SendResponse(ClientServerDialog.ExpectedUserMessage, stream);
+                                    clientResponse = ReadStream(stream, buffer);
+                                    var newUser = Entity.FromJson<User>(clientResponse);
+                                    var userInRepo = repository.Get<User>(x => x.Name == newUser.Name);
+                                    if (userInRepo != null)
+                                    {
+                                        if (chatInRepo.User.Contains(userInRepo))
+                                            SendResponse(ClientServerDialog.AlreadyInChatMessage, stream);
+                                        else
+                                            chatInRepo.User.Add(userInRepo);
+                                    }
+                                    else
+                                    {
+                                        SendResponse(ClientServerDialog.UserNotFoundMessage, stream);
+                                    }
+                                }
+                                break;
+                            default:
+                                clientResponse = ReadStream(stream, buffer);
+                                var message = Entity.FromJson<Message>(clientResponse);
+                                repository.Add<Message>(message);
+                                var messageHandler = new Handler(repository, message.Autor);
+                                SendResponse(messageHandler.GetChatPacket(message.Autor).ToJson(), stream);
+                                break;
+                        }
                     }
                 }
 
@@ -86,5 +169,15 @@ class Server
 
     }
 
+    private void SendResponse(string responseText, NetworkStream stream)
+    {
+        byte[]response = Encoding.UTF8.GetBytes(responseText);
+        stream.Write(response, 0, response.Length);
+    }
 
+    private string ReadStream(NetworkStream stream, byte[] buffer)
+    {
+        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+        return Encoding.UTF8.GetString(buffer, 0, bytesRead);
+    }
 }

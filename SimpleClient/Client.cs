@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
@@ -38,7 +39,7 @@ public class Client
 
     public void PrintMessages(Chat currentChat)
     {
-        Console.Clear();
+        //Console.Clear();
 
         Console.WriteLine("Нажмите Esc, чтобы вернуться к списку чатов");
 
@@ -76,38 +77,68 @@ public class Client
 
     public User AuthUser()
     {
-        string userChoice = PrintMenu();
-
-        Console.Write("Имя пользователя: ");
-        string name = Console.ReadLine();
-        Console.Write("Пароль: ");
-        string password = Console.ReadLine();
-
-        Console.Clear();
-
-        if (userChoice == "1")
+        while (true) 
         {
-            string clientMessage = "Log in";
-            SendString(clientMessage);
+            string userChoice = PrintMenu();
+
+            Console.Write("Имя пользователя: ");
+            string name = Console.ReadLine();
+            Console.Write("Пароль: ");
+            string password = Console.ReadLine();
+
+            User user = new User(name);
+            user.Password = password;
+
+            //Console.Clear();
+
+            if (userChoice == "1") //Вход
+            {
+                SendString(ClientServerDialog.LogInMessage);
+
+                string serverResponse = TakeString();
+                Console.WriteLine(serverResponse);
+
+                SendObj(user);
+                serverResponse = TakeString();
+                if (serverResponse == ClientServerDialog.UserFoundMessage)
+                {
+                    return user;
+                }
+                else
+                {
+                    Console.WriteLine("Ошибка входа, попробуйте снова");
+                }
+
+            }
+            else if (userChoice == "2")
+            {
+                SendString(ClientServerDialog.RegisterMessage);
+
+                string serverResponse = TakeString();
+                Console.WriteLine(serverResponse);
+
+                SendObj(user);
+                serverResponse = TakeString();
+                if (serverResponse == ClientServerDialog.LoginExistsMessage)
+                {
+                    Console.WriteLine("Пользователь уже существует. Попробуйте выполнить вход");
+                }
+                else
+                {
+                    return user;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Некорректный выбор. Попробуйте снова");
+            }
 
         }
-        else if (userChoice == "2")
-        {
-            string clientMessage = "Sign up";
-            SendString(clientMessage);
-        }
-
-        User user = new User(name); //создаем пользователя в обоих случаях?
-        user.Password = password;
-
-        SendObj(user);
-
-        return user;
     }
 
     public void RunChat(User user, string chatName)
     {
-        Console.Clear();
+        //Console.Clear();
 
         while (true)
         {
@@ -128,7 +159,7 @@ public class Client
             Message message = new Message(text, user);
             message.Chat = currentChat;
 
-            SendString("Take message");
+            SendString(ClientServerDialog.MessageIsReadyMessage);
             SendObj(message);
 
             ReadMessages();
@@ -137,19 +168,19 @@ public class Client
 
     public void PrintChats(User user)
     {
-        Console.Clear();
+        //Console.Clear();
 
-        foreach(var chat in chats.Chats)
+        foreach (var chat in chats.Chats)
         {
             Console.WriteLine(chat.Name);
         }
         Console.Write("Хотите добавить новый чат? y/n");
         string userChoice = Console.ReadLine();
-        if(userChoice == "y")
+        if (userChoice == "y")
         {
             AddNewChat(user);
         }
-        else if(userChoice == "n")
+        else if (userChoice == "n")
         {
             Console.Write("Введите название нужного чата из списка: ");
             string chatName = Console.ReadLine();
@@ -168,17 +199,29 @@ public class Client
         newChat.User.Add(user);
 
         string exit = "y";
-        while(exit == "y") 
+        while (exit == "y")
         {
             User newUser = PrintUsers();
             newChat.User.Add(newUser);
             Console.Write("Хотите еще добавить пользователя в чат? y/n");
             exit = Console.ReadLine();
         }
-        SendString("Add new chat");
+        SendString(ClientServerDialog.CreateChatMessage);
+
+        string serverResponse = TakeString();
+        Console.WriteLine(serverResponse);
         SendObj(newChat);
 
-        RunChat(user, chatName);
+        serverResponse = TakeString();
+        Console.WriteLine(serverResponse);
+        if(serverResponse == ClientServerDialog.ChatExistsMessage)
+        {
+            Console.WriteLine("Такой чат уже существует. Попробуйте снова");
+        }
+        else
+        {
+            RunChat(user, chatName);
+        }
     }
 
     public User PrintUsers()
@@ -214,7 +257,7 @@ public class Client
     {
         StringBuilder input = new StringBuilder();
 
-        while(true)
+        while (true)
         {
             var key = Console.ReadKey(intercept: true);
 
@@ -222,17 +265,17 @@ public class Client
             {
                 return null;
             }
-            else if(key.Key == ConsoleKey.Enter)
+            else if (key.Key == ConsoleKey.Enter)
             {
                 Console.WriteLine();
                 return input.ToString();
             }
-            else if(key.Key == ConsoleKey.Backspace)
+            else if (key.Key == ConsoleKey.Backspace)
             {
                 input.Length--;
                 Console.Write("\b \b");
             }
-            else if(!char.IsControl(key.KeyChar))
+            else if (!char.IsControl(key.KeyChar))
             {
                 input.Append(key.KeyChar);
                 Console.Write(key.KeyChar);
@@ -257,6 +300,15 @@ public class Client
             byte[] data = Encoding.UTF8.GetBytes(str);
             stream.Write(data, 0, data.Length);
         }
+    }
+
+    public string TakeString()
+    {
+        byte[] buffer = new byte[10485760];
+        int bytesRead;
+        bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+        return Encoding.UTF8.GetString(buffer, 0, bytesRead);
     }
 }
 

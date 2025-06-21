@@ -44,5 +44,10 @@ public class Handler
         }
         return packet;
     }
+
+    public void AddUserToChat(User user, Chat chat)
+    {
+        
+    }
     
 }
